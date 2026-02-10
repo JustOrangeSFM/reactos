@@ -1387,8 +1387,20 @@ MountMgrQueryVolumePaths(IN PDEVICE_EXTENSION DeviceExtension,
 
             /* This offset is used to "jump" into MultiSz, so, start with the string begin (ie, skip MultiSzLength) */
             Offset = sizeof(ULONG);
+			
+			//Edited
+			if ((*CurrentPath)->MultiSzLength <= sizeof(WCHAR))
+			{
+				DbgPrint("MOUNTMGR: Skipping invalid MultiSz %lu bytes\n", (*CurrentPath)->MultiSzLength);
+				continue;
+			}
+
+			//Edited
+			ULONG MaxIndex = (*CurrentPath)->MultiSzLength / sizeof(WCHAR);
+			if (MaxIndex > 0) MaxIndex--;
+			//Edited
             /* Browse every single letter, and skip last UNICODE_NULL */
-            for (i = 0; i < (*CurrentPath)->MultiSzLength / sizeof(WCHAR) - 1; ++i)
+            for (i = 0; i < MaxIndex; ++i) /*for (i = 0; i < (*CurrentPath)->MultiSzLength / sizeof(WCHAR) - 1; ++i)*/
             {
                 /* Get the letter */
                 MultiSz = (PWSTR)((ULONG_PTR)(*CurrentPath) + Offset);
